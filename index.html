@@ -1,41 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>React Sports Game</title>
-</head>
-<body>
-    <!-- include an element for ReactDOM to attach our React-generated elements to -->
+  </head>
+  <body>
     <div id="root"></div>
 
-    <!-- include React and ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-    <!-- include Babel standalone so we can process JSX in React.createElement stuff -->
-    <script crossorigin src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@16/umd/react.development.js"
+    ></script>
 
-    <!-- include our JS+JSX for the React Appliccation -->
-<script type="text/babel">
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+    ></script>
 
-// An App component under which all other components will be added
-function App (props) {
-  return (
-    <div>
-      <h1>Welcome to the Sports Game starter!</h1>
-      <em>This file represents the way your code should look after completing the <strong>Setup</strong> steps in the instructions.</em>
-    </div>
-  )
-}
+    <script
+      crossorigin
+      src="https://unpkg.com/babel-standalone@6/babel.min.js"
+    ></script>
 
+    <script type="text/babel">
+      class Team extends React.Component {
+        constructor(props) {
+          super(props);
 
+          this.state = {
+            score: 0,
+            shots: 0,
+          };
 
-// Render the App
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-)
-</script>
-</body>
+          this.shotSound = new Audio("./assets/Swish+2.wav");
+
+          this.scoreSound = new Audio("./assets/cheers.wav");
+        }
+
+        shotMaker = (event) => {
+          let score = this.state.score;
+          this.shotSound.play();
+          if (Math.random() > 0.55) {
+            score += 1;
+
+            setTimeout(() => {
+              this.scoreSound.play();
+            }, 20);
+          }
+
+          this.setState((state, props) => ({
+            shots: state.shots + 1,
+            score,
+          }));
+        };
+
+        shotsMade = (event) => {
+          this.setState((state, props) => ({
+            score: state.score + 1,
+          }));
+        };
+
+        render() {
+          let shotPercentageDiv;
+
+          if (this.state.shots) {
+            const shotPercentage = Math.round(
+              (this.state.score / this.state.shots) * 100
+            );
+            shotPercentageDiv = (
+              <div>
+                <strong>Shooting %: {shotPercentage}</strong>
+              </div>
+            );
+          }
+          return (
+            <div>
+              <div className="Team">
+                <img src={this.props.image} alt="Team" />
+                {this.state.shots}
+                <button onClick={(event) => this.shotMaker(event)}>
+                  shots (+)
+                </button>
+              </div>
+              <div>
+                <strong>shots:</strong> {this.state.shots}
+              </div>
+              <div>
+                <strong>score:</strong> {this.state.score}
+              </div>
+              {shotPercentageDiv}
+            </div>
+          );
+        }
+      }
+
+      function Game(props) {
+        return (
+          <div>
+            <h1>Welcome to {props.venue}</h1>
+            <Team name={props.awayTeam.name} image={props.awayTeam.logoSrc} />
+
+            <Team name={props.homeTeam.name} image={props.homeTeam.logoSrc} />
+          </div>
+        );
+      }
+
+      function APP(props) {
+        const tykes = {
+          name: "Tykes",
+          logoSrc:
+            "https://images-na.ssl-images-amazon.com/images/I/91zbz0xmrXL._RI_.jpg",
+        };
+
+        const cyberpunks = {
+          name: "Cyberpunks",
+          logoSrc:
+            "https://www.windowscentral.com/sites/wpcentral.com/files/styles/large/public/field/image/2021/01/cyberpunk-2077-hero-pic.jpg",
+        };
+
+        const assassins = {
+          name: "Assassins Crred",
+          logoSrc:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNF1vyVo-RCQay7yXuyrh1a5niXCTEc-T2bA&usqp=CAU",
+        };
+
+        const elderscrolls = {
+          name: "Skyrim",
+          logoSrc:
+            "https://images.ctfassets.net/rporu91m20dc/bSa1EWng9YTfKj90gBJRN/6ba82b6793686c87781ddf2055f52e7c/Skyrim_LargeCard_JuneFeatMods.png",
+        };
+        return (
+          <div className="App">
+            <Game venue="Arrowhead" homeTeam={tykes} awayTeam={cyberpunks} />
+            <Game
+              venue="Sprint Center"
+              homeTeam={assassins}
+              awayTeam={elderscrolls}
+            />
+          </div>
+        );
+      }
+
+      ReactDOM.render(
+        <APP />,
+
+        document.getElementById("root")
+      );
+    </script>
+  </body>
 </html>
